@@ -2,65 +2,65 @@
    主题强调色
    ========================================================= */
 (function initAccentColor() {
-    if (window.mdui && typeof mdui.setColorScheme === 'function') {
-        mdui.setColorScheme('#006463');
-    }
+  if (window.mdui && typeof mdui.setColorScheme === 'function') {
+    mdui.setColorScheme('#006463');
+  }
 })();
 
 /* =========================================================
    平台检测
    ========================================================= */
 function isWindowsPlatform() {
-    try {
-        return /Windows/i.test(navigator.userAgent || '');
-    } catch (_) {
-        return false;
-    }
+  try {
+    return /Windows/i.test(navigator.userAgent || '');
+  } catch (_) {
+    return false;
+  }
 }
 
 /* =========================================================
    全局状态
    ========================================================= */
 const state = {
-    fontSize: 40,
-    speed: 60,
-    textColor: '#ffffff',
-    guideColor: '#e53935',
-    textWidth: 100,
-    fontFamily: 'mono',
-    customFontFamily: null,
-    showGuide: true,
-    mirror: false,
-    firstLineIndent: false,
-    autoExit: false,
-    disableKeys: false
+  fontSize: 40,
+  speed: 60,
+  textColor: '#ffffff',
+  guideColor: '#e53935',
+  textWidth: 100,
+  fontFamily: 'mono',
+  customFontFamily: null,
+  showGuide: true,
+  mirror: false,
+  firstLineIndent: false,
+  autoExit: false,
+  disableKeys: false
 };
 
 const FONT_STACKS = {
-    mono:
-        "Consolas, Menlo, Monaco, 'Courier New', 'Liberation Mono', " +
-        "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', sans-serif",
-    system:
-        "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', " +
-        "'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', sans-serif",
-    serif:
-        "Georgia, 'Times New Roman', 'Songti SC', SimSun, " +
-        "'Noto Serif SC', 'Source Han Serif SC', serif"
+  mono:
+    "Consolas, Menlo, Monaco, 'Courier New', 'Liberation Mono', " +
+    "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', sans-serif",
+  system:
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', " +
+    "'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', sans-serif",
+  serif:
+    "Georgia, 'Times New Roman', 'Songti SC', SimSun, " +
+    "'Noto Serif SC', 'Source Han Serif SC', serif"
 };
 
 function getFontFamily() {
-    if (state.fontFamily === 'custom' && state.customFontFamily) {
-        return `'${state.customFontFamily}', ` + FONT_STACKS.mono;
-    }
-    return FONT_STACKS[state.fontFamily] || FONT_STACKS.mono;
+  if (state.fontFamily === 'custom' && state.customFontFamily) {
+    return `'${state.customFontFamily}', ` + FONT_STACKS.mono;
+  }
+  return FONT_STACKS[state.fontFamily] || FONT_STACKS.mono;
 }
 
 let isFullscreen = false;
 let currentView = 'home';
 
 const prefersReducedMotion =
-    window.matchMedia &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.matchMedia &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* =========================================================
    DOM
@@ -71,9 +71,9 @@ const viewOptions       = document.getElementById('view-options');
 const viewAbout         = document.getElementById('view-about');
 
 const views = {
-    home: viewHome,
-    options: viewOptions,
-    about: viewAbout
+  home: viewHome,
+  options: viewOptions,
+  about: viewAbout
 };
 
 const editorField       = document.getElementById('editorField');
@@ -142,75 +142,73 @@ const guideText         = document.getElementById('guideText');
 const autoScrollStoppers = new Set();
 
 function stopAllAutoScroll() {
-    autoScrollStoppers.forEach(fn => {
-        try { fn(); } catch (_) {}
-    });
-    autoScrollStoppers.clear();
+  autoScrollStoppers.forEach(fn => {
+    try { fn(); } catch (_) {}
+  });
+  autoScrollStoppers.clear();
 }
 
 /* =========================================================
    底部导航切换
    ========================================================= */
 function switchView(name) {
-    if (name === currentView) return;
+  if (name === currentView) return;
 
-    const targetView = views[name];
-    if (!targetView) return;
+  const targetView = views[name];
+  if (!targetView) return;
 
-    stopAllAutoScroll();
+  stopAllAutoScroll();
 
-    Object.values(views).forEach(v => {
-        v.classList.remove('active');
-    });
+  Object.values(views).forEach(v => {
+    v.classList.remove('active');
+  });
 
-    targetView.classList.add('active');
+  targetView.classList.add('active');
 
-    const order = ['home', 'options', 'about'];
-    const fromIdx = order.indexOf(currentView);
-    const toIdx   = order.indexOf(name);
-    const offset  = toIdx >= fromIdx ? 36 : -36;
+  const order = ['home', 'options', 'about'];
+  const fromIdx = order.indexOf(currentView);
+  const toIdx   = order.indexOf(name);
+  const offset  = toIdx >= fromIdx ? 36 : -36;
 
-    currentView = name;
+  currentView = name;
 
-    if (!prefersReducedMotion && typeof targetView.animate === 'function') {
-        try {
-            /* 动画不带 fill: 'both'，结束后元素回归 CSS 状态，
-               transform 变回 none，避免影响 mdui-select 的 fixed 下拉菜单 */
-            targetView.animate(
-                [
-                    { opacity: 0, transform: `translateX(${offset}px)` },
-                    { opacity: 1, transform: 'translateX(0)' }
-                ],
-                {
-                    duration: 340,
-                    easing: 'cubic-bezier(0.16, 1, 0.3, 1)'
-                }
-            );
-        } catch (_) {}
-    }
+  if (!prefersReducedMotion && typeof targetView.animate === 'function') {
+    try {
+      targetView.animate(
+        [
+          { opacity: 0, transform: `translateX(${offset}px)` },
+          { opacity: 1, transform: 'translateX(0)' }
+        ],
+        {
+          duration: 340,
+          easing: 'cubic-bezier(0.16, 1, 0.3, 1)'
+        }
+      );
+    } catch (_) {}
+  }
 
-    requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, behavior: 'auto' });
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
 
-        previewScroller.measure();
-        mainScroller.measure();
-        previewScroller.setPosition(previewScroller.position);
-        mainScroller.setPosition(mainScroller.position);
-    });
+    previewScroller.measure();
+    mainScroller.measure();
+    previewScroller.setPosition(previewScroller.position);
+    mainScroller.setPosition(mainScroller.position);
+  });
 }
 
 navBar.addEventListener('change', (e) => {
-    switchView(e.target.value);
+  switchView(e.target.value);
 });
 
 const isWideScreen = () => window.matchMedia('(min-width: 840px)').matches;
 
 const bodyStyleObserver = new MutationObserver(() => {
-    if (isWideScreen()) {
-        if (document.body.style.paddingBottom && document.body.style.paddingBottom !== '0px') {
-            document.body.style.paddingBottom = '0px';
-        }
+  if (isWideScreen()) {
+    if (document.body.style.paddingBottom && document.body.style.paddingBottom !== '0px') {
+      document.body.style.paddingBottom = '0px';
     }
+  }
 });
 bodyStyleObserver.observe(document.body, { attributes: true, attributeFilter: ['style'] });
 
@@ -218,70 +216,70 @@ bodyStyleObserver.observe(document.body, { attributes: true, attributeFilter: ['
    滚动器
    ========================================================= */
 function createScroller(viewportEl, textEl, { loop = false, onEnd = null } = {}) {
-    return {
-        viewport: viewportEl,
-        text: textEl,
-        position: 0,
-        playing: false,
-        loop,
-        onEnd,
-        max: 0,
+  return {
+    viewport: viewportEl,
+    text: textEl,
+    position: 0,
+    playing: false,
+    loop,
+    onEnd,
+    max: 0,
 
-        apply() {
-            const base = `translate3d(0, ${-this.position}px, 0)`;
-            this.text.style.transform = state.mirror ? `${base} scaleX(-1)` : base;
-        },
+    apply() {
+      const base = `translate3d(0, ${-this.position}px, 0)`;
+      this.text.style.transform = state.mirror ? `${base} scaleX(-1)` : base;
+    },
 
-        measure() {
-            const h = this.text.offsetHeight || 0;
-            const cs = getComputedStyle(this.text);
-            let lh = parseFloat(cs.lineHeight);
-            if (!lh || Number.isNaN(lh)) lh = state.fontSize * 1.5;
-            this.max = Math.max(0, h + lh * 3);
-        },
+    measure() {
+      const h = this.text.offsetHeight || 0;
+      const cs = getComputedStyle(this.text);
+      let lh = parseFloat(cs.lineHeight);
+      if (!lh || Number.isNaN(lh)) lh = state.fontSize * 1.5;
+      this.max = Math.max(0, h + lh * 3);
+    },
 
-        setPosition(p) {
-            this.position = Math.max(0, Math.min(this.max, p));
-            this.apply();
-        },
+    setPosition(p) {
+      this.position = Math.max(0, Math.min(this.max, p));
+      this.apply();
+    },
 
-        nudge(px) { this.setPosition(this.position + px); },
-        reset() { this.position = 0; this.apply(); },
+    nudge(px) { this.setPosition(this.position + px); },
+    reset() { this.position = 0; this.apply(); },
 
-        step(dt) {
-            if (this.max <= 0) return;
-            this.position += state.speed * dt;
-            if (this.position >= this.max) {
-                if (this.loop) {
-                    this.position = 0;
-                } else {
-                    this.position = this.max;
-                    this.playing = false;
-                    if (typeof this.onEnd === 'function') {
-                        const cb = this.onEnd;
-                        requestAnimationFrame(() => cb());
-                    }
-                }
-            }
-            this.apply();
+    step(dt) {
+      if (this.max <= 0) return;
+      this.position += state.speed * dt;
+      if (this.position >= this.max) {
+        if (this.loop) {
+          this.position = 0;
+        } else {
+          this.position = this.max;
+          this.playing = false;
+          if (typeof this.onEnd === 'function') {
+            const cb = this.onEnd;
+            requestAnimationFrame(() => cb());
+          }
         }
-    };
+      }
+      this.apply();
+    }
+  };
 }
 
 const previewScroller = createScroller(previewViewport, previewText, { loop: true });
 const mainScroller    = createScroller(fsViewport, fsText, {
-    loop: false,
-    onEnd: handlePromptEnd
+  loop: false,
+  onEnd: handlePromptEnd
 });
 
 /* =========================================================
    播放结束处理
    ========================================================= */
 function handlePromptEnd() {
-    if (!isFullscreen) return;
-    closeFsPanel();
-    if (state.autoExit) { exitFullscreen(); return; }
-    endDialog.open = true;
+  if (!isFullscreen) return;
+  closeFsPanel();
+  if (state.autoExit) { exitFullscreen(); return; }
+  endDialog.open = true;
 }
 
 endStayBtn.addEventListener('click', () => { endDialog.open = false; });
@@ -293,13 +291,13 @@ endExitBtn.addEventListener('click', () => { endDialog.open = false; exitFullscr
 let lastTs = 0;
 
 function rafLoop(ts) {
-    const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.1) : 0;
-    lastTs = ts;
+  const dt = lastTs ? Math.min((ts - lastTs) / 1000, 0.1) : 0;
+  lastTs = ts;
 
-    if (mainScroller.playing)    mainScroller.step(dt);
-    if (previewScroller.playing) previewScroller.step(dt);
+  if (mainScroller.playing)    mainScroller.step(dt);
+  if (previewScroller.playing) previewScroller.step(dt);
 
-    requestAnimationFrame(rafLoop);
+  requestAnimationFrame(rafLoop);
 }
 requestAnimationFrame(rafLoop);
 
@@ -308,98 +306,98 @@ requestAnimationFrame(rafLoop);
    ========================================================= */
 let textTimer = null;
 function scheduleTextUpdate() {
-    clearTimeout(textTimer);
-    textTimer = setTimeout(updateText, 120);
+  clearTimeout(textTimer);
+  textTimer = setTimeout(updateText, 120);
 }
 
 function updateText() {
-    const text = editorField.value || '';
-    previewScroller.text.textContent = text;
-    mainScroller.text.textContent = text;
+  const text = editorField.value || '';
+  previewScroller.text.textContent = text;
+  mainScroller.text.textContent = text;
 
-    requestAnimationFrame(() => {
-        previewScroller.measure();
-        mainScroller.measure();
-        previewScroller.setPosition(previewScroller.position);
-        mainScroller.setPosition(mainScroller.position);
-    });
+  requestAnimationFrame(() => {
+    previewScroller.measure();
+    mainScroller.measure();
+    previewScroller.setPosition(previewScroller.position);
+    mainScroller.setPosition(mainScroller.position);
+  });
 }
 
 function getPreviewMinHeight() { return state.fontSize * 3 + 32; }
 
 function applyStyles() {
-    const fs = state.fontSize + 'px';
-    const fontFam = getFontFamily();
+  const fs = state.fontSize + 'px';
+  const fontFam = getFontFamily();
 
-    const sideMarginPct = (100 - state.textWidth) / 2;
-    const marginPctStr = sideMarginPct + '%';
+  const sideMarginPct = (100 - state.textWidth) / 2;
+  const marginPctStr = sideMarginPct + '%';
 
-    [previewViewport, fsViewport].forEach(v => {
-        v.style.fontSize = fs;
-        v.style.setProperty('--page-margin-pct', marginPctStr);
-        v.style.setProperty('--text-font', fontFam);
-        v.style.setProperty('--text-color', state.textColor);
-        v.style.setProperty('--guide-color', state.guideColor);
-        v.classList.toggle('hide-guide', !state.showGuide);
-        v.classList.toggle('indent-first', state.firstLineIndent);
-    });
+  [previewViewport, fsViewport].forEach(v => {
+    v.style.fontSize = fs;
+    v.style.setProperty('--page-margin-pct', marginPctStr);
+    v.style.setProperty('--text-font', fontFam);
+    v.style.setProperty('--text-color', state.textColor);
+    v.style.setProperty('--guide-color', state.guideColor);
+    v.classList.toggle('hide-guide', !state.showGuide);
+    v.classList.toggle('indent-first', state.firstLineIndent);
+  });
 
-    const minH = getPreviewMinHeight();
-    previewPane.style.minHeight = minH + 'px';
-    if (previewPane.offsetHeight < minH) {
-        previewPane.style.height = minH + 'px';
-    }
+  const minH = getPreviewMinHeight();
+  previewPane.style.minHeight = minH + 'px';
+  if (previewPane.offsetHeight < minH) {
+    previewPane.style.height = minH + 'px';
+  }
 
-    previewScroller.measure();
-    mainScroller.measure();
-    previewScroller.apply();
-    mainScroller.apply();
+  previewScroller.measure();
+  mainScroller.measure();
+  previewScroller.apply();
+  mainScroller.apply();
 }
 
 /* =========================================================
    滑块 / 颜色 控件绑定
    ========================================================= */
 function bindSlider(slider, mirrorSlider, valueEl, mirrorValueEl, key, cb) {
-    const handler = (e) => {
-        const val = Number(e.target.value);
-        if (Number.isNaN(val)) return;
-        state[key] = val;
-        valueEl.textContent = val;
-        if (mirrorSlider) mirrorSlider.value = val;
-        if (mirrorValueEl) mirrorValueEl.textContent = val;
-        cb && cb();
-    };
-    slider.addEventListener('input', handler);
-    if (mirrorSlider) mirrorSlider.addEventListener('input', handler);
+  const handler = (e) => {
+    const val = Number(e.target.value);
+    if (Number.isNaN(val)) return;
+    state[key] = val;
+    valueEl.textContent = val;
+    if (mirrorSlider) mirrorSlider.value = val;
+    if (mirrorValueEl) mirrorValueEl.textContent = val;
+    cb && cb();
+  };
+  slider.addEventListener('input', handler);
+  if (mirrorSlider) mirrorSlider.addEventListener('input', handler);
 }
 
 bindSlider(speedSlider, fsSpeedSlider, speedValue, fsSpeedValue, 'speed');
 bindSlider(fontSlider,  fsFontSlider,  fontValue,  fsFontValue,  'fontSize', () => applyStyles());
 
 function bindMarginSlider(slider, mirrorSlider, valueEl, mirrorValueEl) {
-    const handler = (e) => {
-        const val = Number(e.target.value);
-        if (Number.isNaN(val)) return;
-        state.textWidth = val;
-        valueEl.textContent = val + '%';
-        if (mirrorSlider) mirrorSlider.value = val;
-        if (mirrorValueEl) mirrorValueEl.textContent = val + '%';
-        applyStyles();
-    };
-    slider.addEventListener('input', handler);
-    if (mirrorSlider) mirrorSlider.addEventListener('input', handler);
+  const handler = (e) => {
+    const val = Number(e.target.value);
+    if (Number.isNaN(val)) return;
+    state.textWidth = val;
+    valueEl.textContent = val + '%';
+    if (mirrorSlider) mirrorSlider.value = val;
+    if (mirrorValueEl) mirrorValueEl.textContent = val + '%';
+    applyStyles();
+  };
+  slider.addEventListener('input', handler);
+  if (mirrorSlider) mirrorSlider.addEventListener('input', handler);
 }
 
 bindMarginSlider(marginSlider, fsMarginSlider, marginValue, fsMarginValue);
 
 function bindColor(input, mirrorInput, key, cb) {
-    const handler = (e) => {
-        state[key] = e.target.value;
-        if (mirrorInput) mirrorInput.value = e.target.value;
-        cb && cb();
-    };
-    input.addEventListener('input', handler);
-    if (mirrorInput) mirrorInput.addEventListener('input', handler);
+  const handler = (e) => {
+    state[key] = e.target.value;
+    if (mirrorInput) mirrorInput.value = e.target.value;
+    cb && cb();
+  };
+  input.addEventListener('input', handler);
+  if (mirrorInput) mirrorInput.addEventListener('input', handler);
 }
 
 bindColor(textColorInput,  fsTextColor,  'textColor',  () => applyStyles());
@@ -409,18 +407,18 @@ bindColor(guideColorInput, fsGuideColor, 'guideColor', () => applyStyles());
    字体选择
    ========================================================= */
 fontFamilySelect.addEventListener('change', (e) => {
-    state.fontFamily = e.target.value;
-    applyStyles();
+  state.fontFamily = e.target.value;
+  applyStyles();
 });
 
 /* =========================================================
    chip 选项绑定
    ========================================================= */
 function bindChip(chip, onChange) {
-    if (!chip) return;
-    chip.addEventListener('change', () => {
-        requestAnimationFrame(() => onChange(!!chip.selected));
-    });
+  if (!chip) return;
+  chip.addEventListener('change', () => {
+    requestAnimationFrame(() => onChange(!!chip.selected));
+  });
 }
 
 bindChip(chipGuide,    (v) => { state.showGuide = v; applyStyles(); });
@@ -435,186 +433,186 @@ editorField.addEventListener('input', scheduleTextUpdate);
    预览窗高度拖拽
    ========================================================= */
 function bindResize(handle, targetEl, {
-    min = 100,
-    max = 1000,
-    autoScroll = false,
-    scrollEdge = 120,
-    glowEl = null,
-    glowMin = 120,
-    glowMax = 520,
-    glowGain = 1.2
+  min = 100,
+  max = 1000,
+  autoScroll = false,
+  scrollEdge = 120,
+  glowEl = null,
+  glowMin = 120,
+  glowMax = 520,
+  glowGain = 1.2
 } = {}) {
-    const getMinHeight = () => {
-        const v = (typeof min === 'function') ? min() : min;
-        const n = Number(v);
-        return Number.isFinite(n) ? n : 100;
+  const getMinHeight = () => {
+    const v = (typeof min === 'function') ? min() : min;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 100;
+  };
+
+  handle.addEventListener('pointerdown', (e) => {
+    if (currentView !== 'home') return;
+
+    stopAllAutoScroll();
+
+    e.preventDefault();
+    try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+
+    const startY = e.clientY;
+    const startH = targetEl.offsetHeight;
+
+    let accumulated = 0;
+    let virtualY = startY;
+    let scrollActive = false;
+    let scrollRaf = 0;
+    let finished = false;
+
+    let totalScroll = 0;
+    const glowActive = !!glowEl;
+
+    const applyHeight = (h) => {
+      const m = getMinHeight();
+      targetEl.style.height = Math.max(m, Math.min(max, h)) + 'px';
     };
 
-    handle.addEventListener('pointerdown', (e) => {
-        if (currentView !== 'home') return;
+    function updateGlow() {
+      if (!glowActive) return;
+      const size = Math.min(glowMax, glowMin + totalScroll * glowGain);
+      glowEl.style.width  = size + 'px';
+      glowEl.style.height = size + 'px';
+    }
 
-        stopAllAutoScroll();
+    function showGlow() {
+      if (!glowActive) return;
+      glowEl.style.width  = glowMin + 'px';
+      glowEl.style.height = glowMin + 'px';
+      glowEl.classList.add('active');
+    }
 
-        e.preventDefault();
-        try { handle.setPointerCapture(e.pointerId); } catch (_) {}
-
-        const startY = e.clientY;
-        const startH = targetEl.offsetHeight;
-
-        let accumulated = 0;
-        let virtualY = startY;
-        let scrollActive = false;
-        let scrollRaf = 0;
-        let finished = false;
-
-        let totalScroll = 0;
-        const glowActive = !!glowEl;
-
-        const applyHeight = (h) => {
-            const m = getMinHeight();
-            targetEl.style.height = Math.max(m, Math.min(max, h)) + 'px';
-        };
-
-        function updateGlow() {
-            if (!glowActive) return;
-            const size = Math.min(glowMax, glowMin + totalScroll * glowGain);
-            glowEl.style.width  = size + 'px';
-            glowEl.style.height = size + 'px';
+    function hideGlow() {
+      if (!glowActive) return;
+      glowEl.classList.remove('active');
+      setTimeout(() => {
+        if (!glowEl.classList.contains('active')) {
+          glowEl.style.width  = '0px';
+          glowEl.style.height = '0px';
         }
+      }, 300);
+    }
 
-        function showGlow() {
-            if (!glowActive) return;
-            glowEl.style.width  = glowMin + 'px';
-            glowEl.style.height = glowMin + 'px';
-            glowEl.classList.add('active');
-        }
+    function scrollLoop() {
+      if (!scrollActive) { scrollRaf = 0; return; }
 
-        function hideGlow() {
-            if (!glowActive) return;
-            glowEl.classList.remove('active');
-            setTimeout(() => {
-                if (!glowEl.classList.contains('active')) {
-                    glowEl.style.width  = '0px';
-                    glowEl.style.height = '0px';
-                }
-            }, 300);
-        }
+      if (currentView !== 'home') {
+        scrollActive = false;
+        scrollRaf = 0;
+        hideGlow();
+        return;
+      }
 
-        function scrollLoop() {
-            if (!scrollActive) { scrollRaf = 0; return; }
+      if (!targetEl.isConnected || targetEl.offsetParent === null) {
+        scrollActive = false;
+        scrollRaf = 0;
+        hideGlow();
+        return;
+      }
 
-            if (currentView !== 'home') {
-                scrollActive = false;
-                scrollRaf = 0;
-                hideGlow();
-                return;
-            }
+      const dist = window.innerHeight - virtualY;
+      if (dist < scrollEdge) {
+        const speed = Math.min(18, Math.max(1, (scrollEdge - dist) * 0.28));
+        window.scrollBy(0, speed);
+        totalScroll += speed;
+        updateGlow();
+      }
 
-            if (!targetEl.isConnected || targetEl.offsetParent === null) {
-                scrollActive = false;
-                scrollRaf = 0;
-                hideGlow();
-                return;
-            }
+      scrollRaf = requestAnimationFrame(scrollLoop);
+    }
 
-            const dist = window.innerHeight - virtualY;
-            if (dist < scrollEdge) {
-                const speed = Math.min(18, Math.max(1, (scrollEdge - dist) * 0.28));
-                window.scrollBy(0, speed);
-                totalScroll += speed;
-                updateGlow();
-            }
+    function startAutoScroll() {
+      if (!autoScroll || scrollActive) return;
+      scrollActive = true;
+      if (glowActive) {
+        totalScroll = 0;
+        showGlow();
+      }
+      if (!scrollRaf) scrollRaf = requestAnimationFrame(scrollLoop);
+    }
 
-            scrollRaf = requestAnimationFrame(scrollLoop);
-        }
+    function stopAutoScroll() {
+      scrollActive = false;
+      if (scrollRaf) {
+        cancelAnimationFrame(scrollRaf);
+        scrollRaf = 0;
+      }
+      hideGlow();
+    }
 
-        function startAutoScroll() {
-            if (!autoScroll || scrollActive) return;
-            scrollActive = true;
-            if (glowActive) {
-                totalScroll = 0;
-                showGlow();
-            }
-            if (!scrollRaf) scrollRaf = requestAnimationFrame(scrollLoop);
-        }
+    autoScrollStoppers.add(stopAutoScroll);
 
-        function stopAutoScroll() {
-            scrollActive = false;
-            if (scrollRaf) {
-                cancelAnimationFrame(scrollRaf);
-                scrollRaf = 0;
-            }
-            hideGlow();
-        }
+    function onMove(ev) {
+      const locked = document.pointerLockElement === handle;
+      if (locked) {
+        accumulated += ev.movementY || 0;
+        applyHeight(startH + accumulated);
+        virtualY = startY + accumulated;
+      } else {
+        applyHeight(startH + (ev.clientY - startY));
+        virtualY = ev.clientY;
+      }
+    }
 
-        autoScrollStoppers.add(stopAutoScroll);
+    function finish() {
+      if (finished) return;
+      finished = true;
 
-        function onMove(ev) {
-            const locked = document.pointerLockElement === handle;
-            if (locked) {
-                accumulated += ev.movementY || 0;
-                applyHeight(startH + accumulated);
-                virtualY = startY + accumulated;
-            } else {
-                applyHeight(startH + (ev.clientY - startY));
-                virtualY = ev.clientY;
-            }
-        }
+      autoScrollStoppers.delete(stopAutoScroll);
+      stopAutoScroll();
 
-        function finish() {
-            if (finished) return;
-            finished = true;
+      if (document.pointerLockElement === handle) {
+        try { document.exitPointerLock(); } catch (_) {}
+      }
 
-            autoScrollStoppers.delete(stopAutoScroll);
-            stopAutoScroll();
+      try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
 
-            if (document.pointerLockElement === handle) {
-                try { document.exitPointerLock(); } catch (_) {}
-            }
+      handle.removeEventListener('pointermove', onMove);
+      handle.removeEventListener('pointerup', finish);
+      handle.removeEventListener('pointercancel', finish);
+      document.removeEventListener('pointerlockchange', onLockChange);
 
-            try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+      previewScroller.measure();
+      mainScroller.measure();
+    }
 
-            handle.removeEventListener('pointermove', onMove);
-            handle.removeEventListener('pointerup', finish);
-            handle.removeEventListener('pointercancel', finish);
-            document.removeEventListener('pointerlockchange', onLockChange);
+    function onLockChange() {
+      if (document.pointerLockElement !== handle) finish();
+    }
 
-            previewScroller.measure();
-            mainScroller.measure();
-        }
+    startAutoScroll();
 
-        function onLockChange() {
-            if (document.pointerLockElement !== handle) finish();
-        }
+    const supportsLock = typeof handle.requestPointerLock === 'function';
+    const wantLock = isWindowsPlatform() && supportsLock;
 
-        startAutoScroll();
+    if (wantLock) {
+      try {
+        const p = handle.requestPointerLock();
+        if (p && typeof p.then === 'function') p.catch(() => {});
+      } catch (_) {}
+    }
 
-        const supportsLock = typeof handle.requestPointerLock === 'function';
-        const wantLock = isWindowsPlatform() && supportsLock;
-
-        if (wantLock) {
-            try {
-                const p = handle.requestPointerLock();
-                if (p && typeof p.then === 'function') p.catch(() => {});
-            } catch (_) {}
-        }
-
-        handle.addEventListener('pointermove', onMove);
-        handle.addEventListener('pointerup', finish);
-        handle.addEventListener('pointercancel', finish);
-        document.addEventListener('pointerlockchange', onLockChange);
-    });
+    handle.addEventListener('pointermove', onMove);
+    handle.addEventListener('pointerup', finish);
+    handle.addEventListener('pointercancel', finish);
+    document.addEventListener('pointerlockchange', onLockChange);
+  });
 }
 
 bindResize(previewResizer, previewPane, {
-    min: getPreviewMinHeight,
-    max: 900,
-    autoScroll: true,
-    scrollEdge: 120,
-    glowEl: previewScrollGlow,
-    glowMin: 120,
-    glowMax: 520,
-    glowGain: 1.2
+  min: getPreviewMinHeight,
+  max: 900,
+  autoScroll: true,
+  scrollEdge: 120,
+  glowEl: previewScrollGlow,
+  glowMin: 120,
+  glowMax: 520,
+  glowGain: 1.2
 });
 
 /* =========================================================
@@ -631,68 +629,68 @@ fsPanelCloseBtn.addEventListener('click', () => { closeFsPanel(); });
    全屏
    ========================================================= */
 async function enterFullscreen() {
-    if (isFullscreen) return;
-    dismissGuide();
-    stopAllAutoScroll();
+  if (isFullscreen) return;
+  dismissGuide();
+  stopAllAutoScroll();
 
-    fsRoot.classList.add('active');
-    document.body.classList.add('fs-active');
-    closeFsPanel();
-    endDialog.open = false;
+  fsRoot.classList.add('active');
+  document.body.classList.add('fs-active');
+  closeFsPanel();
+  endDialog.open = false;
 
-    try {
-        if (fsRoot.requestFullscreen) {
-            await fsRoot.requestFullscreen({ navigationUI: 'hide' });
-        } else if (fsRoot.webkitRequestFullscreen) {
-            fsRoot.webkitRequestFullscreen();
-        }
-    } catch (err) {
-        console.warn('全屏 API 调用失败，降级为页面内全屏', err);
+  try {
+    if (fsRoot.requestFullscreen) {
+      await fsRoot.requestFullscreen({ navigationUI: 'hide' });
+    } else if (fsRoot.webkitRequestFullscreen) {
+      fsRoot.webkitRequestFullscreen();
     }
+  } catch (err) {
+    console.warn('全屏 API 调用失败，降级为页面内全屏', err);
+  }
 
-    isFullscreen = true;
+  isFullscreen = true;
 
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-        mainScroller.measure();
-        mainScroller.reset();
-        mainScroller.playing = true;
-        lastTs = 0;
-    }));
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    mainScroller.measure();
+    mainScroller.reset();
+    mainScroller.playing = true;
+    lastTs = 0;
+  }));
 
-    try {
-        if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(() => {});
-        }
-    } catch (_) {}
+  try {
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+  } catch (_) {}
 }
 
 function cleanupFullscreen() {
-    if (!isFullscreen) return;
-    isFullscreen = false;
-    mainScroller.playing = false;
-    wheelTimer && clearTimeout(wheelTimer);
-    wheelTimer = null;
-    closeFsPanel();
-    endDialog.open = false;
-    fsRoot.classList.remove('active');
-    document.body.classList.remove('fs-active');
-    try {
-        if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-    } catch (_) {}
+  if (!isFullscreen) return;
+  isFullscreen = false;
+  mainScroller.playing = false;
+  wheelTimer && clearTimeout(wheelTimer);
+  wheelTimer = null;
+  closeFsPanel();
+  endDialog.open = false;
+  fsRoot.classList.remove('active');
+  document.body.classList.remove('fs-active');
+  try {
+    if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+  } catch (_) {}
 }
 
 function exitFullscreen() {
-    if (document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-    }
-    cleanupFullscreen();
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+  cleanupFullscreen();
 }
 
 document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) cleanupFullscreen();
+  if (!document.fullscreenElement) cleanupFullscreen();
 });
 document.addEventListener('webkitfullscreenchange', () => {
-    if (!document.webkitFullscreenElement) cleanupFullscreen();
+  if (!document.webkitFullscreenElement) cleanupFullscreen();
 });
 
 startBtn.addEventListener('click', enterFullscreen);
@@ -704,41 +702,41 @@ fsExitBtn.addEventListener('click', exitFullscreen);
 let dragState = null;
 
 fsViewport.addEventListener('pointerdown', (e) => {
-    if (!isFullscreen) return;
-    if (endDialog.open) return;
-    e.preventDefault();
+  if (!isFullscreen) return;
+  if (endDialog.open) return;
+  e.preventDefault();
 
-    try { fsViewport.setPointerCapture(e.pointerId); } catch (_) {}
+  try { fsViewport.setPointerCapture(e.pointerId); } catch (_) {}
 
-    dragState = {
-        id: e.pointerId,
-        startY: e.clientY,
-        startPos: mainScroller.position
-    };
+  dragState = {
+    id: e.pointerId,
+    startY: e.clientY,
+    startPos: mainScroller.position
+  };
 
-    mainScroller.playing = false;
-    fsViewport.classList.add('dragging');
+  mainScroller.playing = false;
+  fsViewport.classList.add('dragging');
 });
 
 fsViewport.addEventListener('pointermove', (e) => {
-    if (!dragState || e.pointerId !== dragState.id) return;
-    e.preventDefault();
-    const dy = e.clientY - dragState.startY;
-    mainScroller.setPosition(dragState.startPos - dy);
+  if (!dragState || e.pointerId !== dragState.id) return;
+  e.preventDefault();
+  const dy = e.clientY - dragState.startY;
+  mainScroller.setPosition(dragState.startPos - dy);
 });
 
 function endDrag(e) {
-    if (!dragState || (e && e.pointerId !== dragState.id)) return;
-    dragState = null;
-    fsViewport.classList.remove('dragging');
-    mainScroller.playing = true;
-    lastTs = 0;
+  if (!dragState || (e && e.pointerId !== dragState.id)) return;
+  dragState = null;
+  fsViewport.classList.remove('dragging');
+  mainScroller.playing = true;
+  lastTs = 0;
 }
 
 fsViewport.addEventListener('pointerup', endDrag);
 fsViewport.addEventListener('pointercancel', endDrag);
 fsViewport.addEventListener('pointerleave', (e) => {
-    if (dragState && e.buttons === 0) endDrag(e);
+  if (dragState && e.buttons === 0) endDrag(e);
 });
 
 /* =========================================================
@@ -748,68 +746,68 @@ let wheelTimer = null;
 let wheelWasPlaying = false;
 
 fsViewport.addEventListener('wheel', (e) => {
-    if (!isFullscreen) return;
-    if (endDialog.open) return;
-    e.preventDefault();
+  if (!isFullscreen) return;
+  if (endDialog.open) return;
+  e.preventDefault();
 
-    if (!wheelTimer) wheelWasPlaying = mainScroller.playing;
-    mainScroller.playing = false;
+  if (!wheelTimer) wheelWasPlaying = mainScroller.playing;
+  mainScroller.playing = false;
 
-    let delta = e.deltaY;
-    if (e.deltaMode === 1) delta *= state.fontSize * 1.5;
-    else if (e.deltaMode === 2) delta *= window.innerHeight;
+  let delta = e.deltaY;
+  if (e.deltaMode === 1) delta *= state.fontSize * 1.5;
+  else if (e.deltaMode === 2) delta *= window.innerHeight;
 
-    mainScroller.nudge(delta);
+  mainScroller.nudge(delta);
 
-    clearTimeout(wheelTimer);
-    wheelTimer = setTimeout(() => {
-        wheelTimer = null;
-        if (wheelWasPlaying && !dragState && !endDialog.open) {
-            mainScroller.playing = true;
-            lastTs = 0;
-        }
-    }, 700);
+  clearTimeout(wheelTimer);
+  wheelTimer = setTimeout(() => {
+    wheelTimer = null;
+    if (wheelWasPlaying && !dragState && !endDialog.open) {
+      mainScroller.playing = true;
+      lastTs = 0;
+    }
+  }, 700);
 }, { passive: false });
 
 /* =========================================================
    键盘快捷键
    ========================================================= */
 function togglePlay() {
-    mainScroller.playing = !mainScroller.playing;
-    lastTs = 0;
+  mainScroller.playing = !mainScroller.playing;
+  lastTs = 0;
 }
 
 document.addEventListener('keydown', (e) => {
-    if (!isFullscreen) return;
-    if (state.disableKeys) return;
+  if (!isFullscreen) return;
+  if (state.disableKeys) return;
 
-    if (endDialog.open) {
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            endDialog.open = false;
-        }
-        return;
+  if (endDialog.open) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      endDialog.open = false;
     }
+    return;
+  }
 
-    const tag = (e.target && e.target.tagName) || '';
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) {
-        if (e.key !== 'Escape') return;
-    }
+  const tag = (e.target && e.target.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) {
+    if (e.key !== 'Escape') return;
+  }
 
-    const lineH = state.fontSize * 1.5;
+  const lineH = state.fontSize * 1.5;
 
-    switch (e.key) {
-        case ' ': case 'Spacebar':
-            e.preventDefault(); togglePlay(); break;
-        case 'ArrowUp': case 'ArrowLeft': case 'PageUp':
-            e.preventDefault(); mainScroller.nudge(-lineH * 2); break;
-        case 'ArrowDown': case 'ArrowRight': case 'PageDown':
-            e.preventDefault(); mainScroller.nudge(lineH * 2); break;
-        case 'r': case 'R':
-            e.preventDefault(); mainScroller.reset(); break;
-        case 'Escape':
-            exitFullscreen(); break;
-    }
+  switch (e.key) {
+    case ' ': case 'Spacebar':
+      e.preventDefault(); togglePlay(); break;
+    case 'ArrowUp': case 'ArrowLeft': case 'PageUp':
+      e.preventDefault(); mainScroller.nudge(-lineH * 2); break;
+    case 'ArrowDown': case 'ArrowRight': case 'PageDown':
+      e.preventDefault(); mainScroller.nudge(lineH * 2); break;
+    case 'r': case 'R':
+      e.preventDefault(); mainScroller.reset(); break;
+    case 'Escape':
+      exitFullscreen(); break;
+  }
 });
 
 /* =========================================================
@@ -841,395 +839,508 @@ const GLOW_DELAY_MS      = 100;
 function resetVelocity() { velocityX = 0; velocityY = 0; lastDragT = 0; }
 
 function rippleMaxRadius(x, y) {
-    const w = window.innerWidth, h = window.innerHeight;
-    return Math.max(
-        Math.hypot(x, y), Math.hypot(w - x, y),
-        Math.hypot(x, h - y), Math.hypot(w - x, h - y)
-    );
+  const w = window.innerWidth, h = window.innerHeight;
+  return Math.max(
+    Math.hypot(x, y), Math.hypot(w - x, y),
+    Math.hypot(x, h - y), Math.hypot(w - x, h - y)
+  );
 }
 
 function easeOutExpo(t) { return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t); }
 function easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 function setRippleMask(mask) {
-    if (mask === rippleLastMask) return;
-    rippleLastMask = mask;
-    dropRippleMask.style.webkitMaskImage = mask;
-    dropRippleMask.style.maskImage = mask;
+  if (mask === rippleLastMask) return;
+  rippleLastMask = mask;
+  dropRippleMask.style.webkitMaskImage = mask;
+  dropRippleMask.style.maskImage = mask;
 }
 
 const EDGE_FEATHER = 2;
 
 function applyRippleMask() {
-    if (ripplePhase === 'collapse') {
-        const hole = Math.max(0, rippleR);
-        const m =
-            `radial-gradient(circle at ${rippleCX}px ${rippleCY}px, ` +
-            `transparent 0, transparent ${hole}px, ` +
-            `black ${hole + EDGE_FEATHER}px, black 100%)`;
-        setRippleMask(m);
-    } else {
-        const r = Math.max(0, rippleR);
-        const m =
-            `radial-gradient(circle at ${rippleCX}px ${rippleCY}px, ` +
-            `black 0, black ${r}px, ` +
-            `transparent ${r + EDGE_FEATHER}px)`;
-        setRippleMask(m);
-    }
+  if (ripplePhase === 'collapse') {
+    const hole = Math.max(0, rippleR);
+    const m =
+      `radial-gradient(circle at ${rippleCX}px ${rippleCY}px, ` +
+      `transparent 0, transparent ${hole}px, ` +
+      `black ${hole + EDGE_FEATHER}px, black 100%)`;
+    setRippleMask(m);
+  } else {
+    const r = Math.max(0, rippleR);
+    const m =
+      `radial-gradient(circle at ${rippleCX}px ${rippleCY}px, ` +
+      `black 0, black ${r}px, ` +
+      `transparent ${r + EDGE_FEATHER}px)`;
+    setRippleMask(m);
+  }
 }
 
 function resetRipple() {
-    ripplePhase = 'idle';
-    rippleRaf = 0;
-    rippleStartTime = 0;
-    dropRipple.classList.remove('visible', 'covered');
+  ripplePhase = 'idle';
+  rippleRaf = 0;
+  rippleStartTime = 0;
+  dropRipple.classList.remove('visible', 'covered');
 }
 
 function rippleLoop(ts) {
-    if (ripplePhase === 'idle') { rippleRaf = 0; rippleStartTime = 0; return; }
-    if (!rippleStartTime) rippleStartTime = ts;
-    const elapsed = ts - rippleStartTime;
+  if (ripplePhase === 'idle') { rippleRaf = 0; rippleStartTime = 0; return; }
+  if (!rippleStartTime) rippleStartTime = ts;
+  const elapsed = ts - rippleStartTime;
 
-    if (ripplePhase === 'expand') {
-        const t = Math.min(1, elapsed / RIPPLE_EXPAND_MS);
-        rippleR = easeOutExpo(t) * (rippleMaxRadius(rippleCX, rippleCY) + 60);
-        applyRippleMask();
-        if (t >= 1) { ripplePhase = 'hold'; rippleRaf = 0; rippleStartTime = 0; return; }
-    } else if (ripplePhase === 'hold') {
-        rippleRaf = 0; return;
-    } else if (ripplePhase === 'shrink') {
-        const t = Math.min(1, elapsed / RIPPLE_SHRINK_MS);
-        const eased = easeInOutCubic(t);
-        rippleCX = rippleStartCX + (rippleTargetX - rippleStartCX) * eased;
-        rippleCY = rippleStartCY + (rippleTargetY - rippleStartCY) * eased;
-        rippleR  = rippleStartR * (1 - eased);
-        applyRippleMask();
-        if (t >= 1) { resetRipple(); return; }
-    } else if (ripplePhase === 'collapse') {
-        const maxR = rippleMaxRadius(rippleCX, rippleCY) + 90;
-        const t = Math.min(1, elapsed / RIPPLE_COLLAPSE_MS);
-        rippleR = easeOutExpo(t) * maxR;
-        applyRippleMask();
-        if (t >= 1) { resetRipple(); return; }
-    }
+  if (ripplePhase === 'expand') {
+    const t = Math.min(1, elapsed / RIPPLE_EXPAND_MS);
+    rippleR = easeOutExpo(t) * (rippleMaxRadius(rippleCX, rippleCY) + 60);
+    applyRippleMask();
+    if (t >= 1) { ripplePhase = 'hold'; rippleRaf = 0; rippleStartTime = 0; return; }
+  } else if (ripplePhase === 'hold') {
+    rippleRaf = 0; return;
+  } else if (ripplePhase === 'shrink') {
+    const t = Math.min(1, elapsed / RIPPLE_SHRINK_MS);
+    const eased = easeInOutCubic(t);
+    rippleCX = rippleStartCX + (rippleTargetX - rippleStartCX) * eased;
+    rippleCY = rippleStartCY + (rippleTargetY - rippleStartCY) * eased;
+    rippleR  = rippleStartR * (1 - eased);
+    applyRippleMask();
+    if (t >= 1) { resetRipple(); return; }
+  } else if (ripplePhase === 'collapse') {
+    const maxR = rippleMaxRadius(rippleCX, rippleCY) + 90;
+    const t = Math.min(1, elapsed / RIPPLE_COLLAPSE_MS);
+    rippleR = easeOutExpo(t) * maxR;
+    applyRippleMask();
+    if (t >= 1) { resetRipple(); return; }
+  }
 
-    rippleRaf = requestAnimationFrame(rippleLoop);
+  rippleRaf = requestAnimationFrame(rippleLoop);
 }
 
 function startRippleExpand(x, y) {
-    if (glowTimer) { clearTimeout(glowTimer); glowTimer = null; }
-    ripplePhase = 'expand';
-    rippleCX = x; rippleCY = y; rippleR = 0;
-    rippleStartTime = 0; rippleLastMask = '';
-    lastDragX = x; lastDragY = y; resetVelocity();
+  if (glowTimer) { clearTimeout(glowTimer); glowTimer = null; }
+  ripplePhase = 'expand';
+  rippleCX = x; rippleCY = y; rippleR = 0;
+  rippleStartTime = 0; rippleLastMask = '';
+  lastDragX = x; lastDragY = y; resetVelocity();
 
-    dropRipple.classList.add('visible');
-    dropRipple.classList.remove('covered');
-    dropCursorGlow.style.left = x + 'px';
-    dropCursorGlow.style.top = y + 'px';
-    applyRippleMask();
+  dropRipple.classList.add('visible');
+  dropRipple.classList.remove('covered');
+  dropCursorGlow.style.left = x + 'px';
+  dropCursorGlow.style.top = y + 'px';
+  applyRippleMask();
 
-    if (!rippleRaf) rippleRaf = requestAnimationFrame(rippleLoop);
+  if (!rippleRaf) rippleRaf = requestAnimationFrame(rippleLoop);
 
-    glowTimer = setTimeout(() => {
-        glowTimer = null;
-        if (ripplePhase === 'expand' || ripplePhase === 'hold') {
-            dropRipple.classList.add('covered');
-        }
-    }, GLOW_DELAY_MS);
+  glowTimer = setTimeout(() => {
+    glowTimer = null;
+    if (ripplePhase === 'expand' || ripplePhase === 'hold') {
+      dropRipple.classList.add('covered');
+    }
+  }, GLOW_DELAY_MS);
 }
 
 function updateRippleCursor(x, y) {
-    if (ripplePhase === 'expand' || ripplePhase === 'hold') {
-        dropCursorGlow.style.left = x + 'px';
-        dropCursorGlow.style.top = y + 'px';
-    }
+  if (ripplePhase === 'expand' || ripplePhase === 'hold') {
+    dropCursorGlow.style.left = x + 'px';
+    dropCursorGlow.style.top = y + 'px';
+  }
 }
 
 function startRippleShrink() {
-    if (ripplePhase === 'idle') {
-        dropRipple.classList.remove('visible', 'covered');
-        return;
-    }
-    if (glowTimer) { clearTimeout(glowTimer); glowTimer = null; }
+  if (ripplePhase === 'idle') {
+    dropRipple.classList.remove('visible', 'covered');
+    return;
+  }
+  if (glowTimer) { clearTimeout(glowTimer); glowTimer = null; }
 
-    rippleStartCX = rippleCX; rippleStartCY = rippleCY; rippleStartR = rippleR;
+  rippleStartCX = rippleCX; rippleStartCY = rippleCY; rippleStartR = rippleR;
 
-    let ux = 0, uy = 0, hasDir = false;
-    const speed = Math.hypot(velocityX, velocityY);
-    if (speed >= MIN_SPEED) {
-        ux = velocityX / speed; uy = velocityY / speed; hasDir = true;
-    }
-    if (!hasDir) {
-        const dx = lastDragX - rippleStartCX, dy = lastDragY - rippleStartCY;
-        const len = Math.hypot(dx, dy);
-        if (len >= 8) { ux = dx / len; uy = dy / len; hasDir = true; }
-    }
-    if (!hasDir) {
-        const w = window.innerWidth, h = window.innerHeight;
-        const dL = lastDragX, dR = w - lastDragX, dT = lastDragY, dB = h - lastDragY;
-        const minD = Math.min(dL, dR, dT, dB);
-        if (minD === dL) { ux = -1; uy = 0; }
-        else if (minD === dR) { ux = 1; uy = 0; }
-        else if (minD === dT) { ux = 0; uy = -1; }
-        else { ux = 0; uy = 1; }
-    }
+  let ux = 0, uy = 0, hasDir = false;
+  const speed = Math.hypot(velocityX, velocityY);
+  if (speed >= MIN_SPEED) {
+    ux = velocityX / speed; uy = velocityY / speed; hasDir = true;
+  }
+  if (!hasDir) {
+    const dx = lastDragX - rippleStartCX, dy = lastDragY - rippleStartCY;
+    const len = Math.hypot(dx, dy);
+    if (len >= 8) { ux = dx / len; uy = dy / len; hasDir = true; }
+  }
+  if (!hasDir) {
+    const w = window.innerWidth, h = window.innerHeight;
+    const dL = lastDragX, dR = w - lastDragX, dT = lastDragY, dB = h - lastDragY;
+    const minD = Math.min(dL, dR, dT, dB);
+    if (minD === dL) { ux = -1; uy = 0; }
+    else if (minD === dR) { ux = 1; uy = 0; }
+    else if (minD === dT) { ux = 0; uy = -1; }
+    else { ux = 0; uy = 1; }
+  }
 
-    const screenDiag = Math.hypot(window.innerWidth, window.innerHeight);
-    const slideDist = Math.max(screenDiag * 0.5, rippleStartR * 0.8, 200);
-    rippleTargetX = rippleStartCX + ux * slideDist;
-    rippleTargetY = rippleStartCY + uy * slideDist;
+  const screenDiag = Math.hypot(window.innerWidth, window.innerHeight);
+  const slideDist = Math.max(screenDiag * 0.5, rippleStartR * 0.8, 200);
+  rippleTargetX = rippleStartCX + ux * slideDist;
+  rippleTargetY = rippleStartCY + uy * slideDist;
 
-    ripplePhase = 'shrink';
-    rippleStartTime = 0;
-    dropRipple.classList.remove('covered');
-    applyRippleMask();
-    if (!rippleRaf) rippleRaf = requestAnimationFrame(rippleLoop);
+  ripplePhase = 'shrink';
+  rippleStartTime = 0;
+  dropRipple.classList.remove('covered');
+  applyRippleMask();
+  if (!rippleRaf) rippleRaf = requestAnimationFrame(rippleLoop);
 }
 
 function startRippleCollapse(x, y) {
-    if (ripplePhase === 'idle') {
-        dropRipple.classList.remove('visible', 'covered');
-        return;
-    }
-    if (glowTimer) { clearTimeout(glowTimer); glowTimer = null; }
+  if (ripplePhase === 'idle') {
+    dropRipple.classList.remove('visible', 'covered');
+    return;
+  }
+  if (glowTimer) { clearTimeout(glowTimer); glowTimer = null; }
 
-    ripplePhase = 'collapse';
-    rippleCX = x; rippleCY = y; rippleR = 0;
-    rippleStartTime = 0; rippleLastMask = '';
+  ripplePhase = 'collapse';
+  rippleCX = x; rippleCY = y; rippleR = 0;
+  rippleStartTime = 0; rippleLastMask = '';
 
-    dropRipple.classList.remove('covered');
-    applyRippleMask();
-    if (!rippleRaf) rippleRaf = requestAnimationFrame(rippleLoop);
+  dropRipple.classList.remove('covered');
+  applyRippleMask();
+  if (!rippleRaf) rippleRaf = requestAnimationFrame(rippleLoop);
 }
 
 function isFileDrag(e) {
-    const dt = e.dataTransfer;
-    if (!dt) return false;
-    const types = dt.types;
-    if (!types) return false;
-    for (let i = 0; i < types.length; i++) {
-        if (types[i] === 'Files') return true;
-    }
-    return false;
+  const dt = e.dataTransfer;
+  if (!dt) return false;
+  const types = dt.types;
+  if (!types) return false;
+  for (let i = 0; i < types.length; i++) {
+    if (types[i] === 'Files') return true;
+  }
+  return false;
 }
 
 window.addEventListener('dragenter', (e) => {
-    if (!isFileDrag(e)) return;
-    e.preventDefault();
-    rippleDragDepth++;
-    if (rippleDragDepth === 1) {
-        const startX = e.clientX, startY = e.clientY;
-        if (rippleDelayTimer) clearTimeout(rippleDelayTimer);
-        rippleDelayTimer = setTimeout(() => {
-            rippleDelayTimer = null;
-            startRippleExpand(startX, startY);
-        }, RIPPLE_DELAY_MS);
-    }
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+  rippleDragDepth++;
+  if (rippleDragDepth === 1) {
+    const startX = e.clientX, startY = e.clientY;
+    if (rippleDelayTimer) clearTimeout(rippleDelayTimer);
+    rippleDelayTimer = setTimeout(() => {
+      rippleDelayTimer = null;
+      startRippleExpand(startX, startY);
+    }, RIPPLE_DELAY_MS);
+  }
 });
 
 window.addEventListener('dragover', (e) => {
-    if (!isFileDrag(e)) return;
-    e.preventDefault();
-    if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+  if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
 
-    const now = performance.now();
-    if (lastDragT > 0) {
-        const dt = (now - lastDragT) / 1000;
-        if (dt > 0.001 && dt < 0.3) {
-            const vx = (e.clientX - lastDragX) / dt;
-            const vy = (e.clientY - lastDragY) / dt;
-            velocityX = velocityX * VELOCITY_SMOOTH + vx * (1 - VELOCITY_SMOOTH);
-            velocityY = velocityY * VELOCITY_SMOOTH + vy * (1 - VELOCITY_SMOOTH);
-        }
+  const now = performance.now();
+  if (lastDragT > 0) {
+    const dt = (now - lastDragT) / 1000;
+    if (dt > 0.001 && dt < 0.3) {
+      const vx = (e.clientX - lastDragX) / dt;
+      const vy = (e.clientY - lastDragY) / dt;
+      velocityX = velocityX * VELOCITY_SMOOTH + vx * (1 - VELOCITY_SMOOTH);
+      velocityY = velocityY * VELOCITY_SMOOTH + vy * (1 - VELOCITY_SMOOTH);
     }
-    lastDragT = now;
-    lastDragX = e.clientX;
-    lastDragY = e.clientY;
-    updateRippleCursor(e.clientX, e.clientY);
+  }
+  lastDragT = now;
+  lastDragX = e.clientX;
+  lastDragY = e.clientY;
+  updateRippleCursor(e.clientX, e.clientY);
 });
 
 window.addEventListener('dragleave', (e) => {
-    if (!isFileDrag(e)) return;
-    rippleDragDepth = Math.max(0, rippleDragDepth - 1);
-    if (rippleDragDepth === 0) {
-        if (rippleDelayTimer) {
-            clearTimeout(rippleDelayTimer);
-            rippleDelayTimer = null;
-            return;
-        }
-        startRippleShrink();
+  if (!isFileDrag(e)) return;
+  rippleDragDepth = Math.max(0, rippleDragDepth - 1);
+  if (rippleDragDepth === 0) {
+    if (rippleDelayTimer) {
+      clearTimeout(rippleDelayTimer);
+      rippleDelayTimer = null;
+      return;
     }
+    startRippleShrink();
+  }
 });
 
 window.addEventListener('drop', async (e) => {
-    e.preventDefault();
-    rippleDragDepth = 0;
-    if (rippleDelayTimer) {
-        clearTimeout(rippleDelayTimer);
-        rippleDelayTimer = null;
-    }
-    startRippleCollapse(e.clientX, e.clientY);
-    const files = e.dataTransfer && e.dataTransfer.files;
-    if (files && files.length) await importFile(files[0]);
+  e.preventDefault();
+  rippleDragDepth = 0;
+  if (rippleDelayTimer) {
+    clearTimeout(rippleDelayTimer);
+    rippleDelayTimer = null;
+  }
+  startRippleCollapse(e.clientX, e.clientY);
+  const files = e.dataTransfer && e.dataTransfer.files;
+  if (files && files.length) await importFile(files[0]);
 });
 
 window.addEventListener('resize', () => {
-    if (ripplePhase === 'expand' || ripplePhase === 'hold') {
-        rippleR = rippleMaxRadius(rippleCX, rippleCY) + 60;
-        applyRippleMask();
-    }
+  if (ripplePhase === 'expand' || ripplePhase === 'hold') {
+    rippleR = rippleMaxRadius(rippleCX, rippleCY) + 60;
+    applyRippleMask();
+  }
 });
 
 /* =========================================================
-   文件导入
+   文件导入 —— 类型检测
    ========================================================= */
 const TEXT_EXT = ['txt', 'md', 'markdown', 'text'];
 const FONT_EXT = ['ttf', 'otf', 'woff', 'woff2'];
 
 let mammothPromise = null;
 function ensureMammoth() {
-    if (window.mammoth) return Promise.resolve();
-    if (mammothPromise) return mammothPromise;
-    mammothPromise = new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js';
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error('无法加载 docx 解析库'));
-        document.head.appendChild(s);
-    });
-    return mammothPromise;
+  if (window.mammoth) return Promise.resolve();
+  if (mammothPromise) return mammothPromise;
+  mammothPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js';
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('无法加载 docx 解析库'));
+    document.head.appendChild(s);
+  });
+  return mammothPromise;
 }
 
 let jszipPromise = null;
 function ensureJSZip() {
-    if (window.JSZip) return Promise.resolve();
-    if (jszipPromise) return jszipPromise;
-    jszipPromise = new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js';
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error('无法加载 odt 解析库'));
-        document.head.appendChild(s);
-    });
-    return jszipPromise;
+  if (window.JSZip) return Promise.resolve();
+  if (jszipPromise) return jszipPromise;
+  jszipPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://unpkg.com/jszip@3.10.1/dist/jszip.min.js';
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('无法加载 odt 解析库'));
+    document.head.appendChild(s);
+  });
+  return jszipPromise;
 }
 
 function extractOdtText(xmlString) {
-    const doc = new DOMParser().parseFromString(xmlString, 'application/xml');
-    if (doc.querySelector('parsererror')) throw new Error('ODT 内容解析失败');
-    const TEXT_NS = 'urn:oasis:names:tc:opendocument:xmlns:text:1.0';
-    const lines = [];
-    const all = doc.getElementsByTagName('*');
-    for (let i = 0; i < all.length; i++) {
-        const el = all[i];
-        if (el.localName === 'p' || el.localName === 'h') {
-            lines.push(readNode(el, TEXT_NS));
-        }
+  const doc = new DOMParser().parseFromString(xmlString, 'application/xml');
+  if (doc.querySelector('parsererror')) throw new Error('ODT 内容解析失败');
+  const TEXT_NS = 'urn:oasis:names:tc:opendocument:xmlns:text:1.0';
+  const lines = [];
+  const all = doc.getElementsByTagName('*');
+  for (let i = 0; i < all.length; i++) {
+    const el = all[i];
+    if (el.localName === 'p' || el.localName === 'h') {
+      lines.push(readNode(el, TEXT_NS));
     }
-    return lines.join('\n');
+  }
+  return lines.join('\n');
 }
 
 function readNode(el, TEXT_NS) {
-    let out = '';
-    const kids = el.childNodes;
-    for (let i = 0; i < kids.length; i++) {
-        const c = kids[i];
-        if (c.nodeType === 3) out += c.nodeValue;
-        else if (c.nodeType === 1) {
-            const ln = c.localName;
-            if (ln === 's') {
-                const n = parseInt(c.getAttributeNS(TEXT_NS, 'c') || '1', 10);
-                out += ' '.repeat(Number.isNaN(n) ? 1 : n);
-            } else if (ln === 'tab') out += '\t';
-            else if (ln === 'line-break') out += '\n';
-            else out += readNode(c, TEXT_NS);
-        }
+  let out = '';
+  const kids = el.childNodes;
+  for (let i = 0; i < kids.length; i++) {
+    const c = kids[i];
+    if (c.nodeType === 3) out += c.nodeValue;
+    else if (c.nodeType === 1) {
+      const ln = c.localName;
+      if (ln === 's') {
+        const n = parseInt(c.getAttributeNS(TEXT_NS, 'c') || '1', 10);
+        out += ' '.repeat(Number.isNaN(n) ? 1 : n);
+      } else if (ln === 'tab') out += '\t';
+      else if (ln === 'line-break') out += '\n';
+      else out += readNode(c, TEXT_NS);
     }
-    return out;
+  }
+  return out;
 }
 
 function toast(message) {
-    try { mdui.snackbar({ message, placement: 'bottom' }); }
-    catch (_) { console.log(message); }
+  try { mdui.snackbar({ message, placement: 'bottom' }); }
+  catch (_) { console.log(message); }
+}
+
+/* —— 文件类型检测：魔数优先，扩展名兜底 —— */
+async function detectFileKind(file) {
+  const head = new Uint8Array(await file.slice(0, 4096).arrayBuffer());
+
+  if (head.length === 0) return 'text';
+
+  // ZIP 家族：可能是 docx 或 odt
+  if (
+    head[0] === 0x50 && head[1] === 0x4B &&
+    (head[2] === 0x03 || head[2] === 0x05 || head[2] === 0x07) &&
+    (head[3] === 0x04 || head[3] === 0x06 || head[3] === 0x08)
+  ) {
+    try {
+      await ensureJSZip();
+      const arrayBuffer = await file.arrayBuffer();
+      const zip = await window.JSZip.loadAsync(arrayBuffer);
+
+      // ODT：mimetype 文件内容为 application/vnd.oasis.opendocument.text
+      const mimetypeFile = zip.file('mimetype');
+      if (mimetypeFile) {
+        const mime = await mimetypeFile.async('string');
+        if (mime.indexOf('opendocument.text') !== -1) return 'odt';
+      }
+
+      // DOCX：word/document.xml
+      if (zip.file('word/document.xml')) return 'docx';
+
+      return 'unknown';
+    } catch (e) {
+      console.error('ZIP 解析失败', e);
+      return 'unknown';
+    }
+  }
+
+  // OLE2 复合文档：旧版 Office 二进制格式（.doc / .xls / .ppt 等）
+  if (
+    head.length >= 8 &&
+    head[0] === 0xD0 && head[1] === 0xCF &&
+    head[2] === 0x11 && head[3] === 0xE0 &&
+    head[4] === 0xA1 && head[5] === 0xB1 &&
+    head[6] === 0x1A && head[7] === 0xE1
+  ) {
+    return 'doc';
+  }
+
+  // 字体魔数
+  if (head.length >= 4) {
+    // TTF: 00 01 00 00
+    if (head[0] === 0x00 && head[1] === 0x01 && head[2] === 0x00 && head[3] === 0x00) return 'font';
+    // OTF: OTTO
+    if (head[0] === 0x4F && head[1] === 0x54 && head[2] === 0x54 && head[3] === 0x4F) return 'font';
+    // WOFF: wOFF
+    if (head[0] === 0x77 && head[1] === 0x4F && head[2] === 0x46 && head[3] === 0x46) return 'font';
+    // WOFF2: wOF2
+    if (head[0] === 0x77 && head[1] === 0x4F && head[2] === 0x46 && head[3] === 0x32) return 'font';
+  }
+
+  // 尝试按 UTF-8 严格解码判断是否文本
+  try {
+    const text = new TextDecoder('utf-8', { fatal: true }).decode(head);
+    let ctrlCount = 0;
+    for (let i = 0; i < text.length; i++) {
+      const code = text.charCodeAt(i);
+      // TAB / LF / CR 之外的 < 0x20 控制字符
+      if (code < 0x20 && code !== 0x09 && code !== 0x0A && code !== 0x0D) {
+        ctrlCount++;
+      }
+    }
+    if (ctrlCount / text.length < 0.01) return 'text';
+  } catch (_) {
+    // UTF-8 解码失败，不是文本
+  }
+
+  return 'unknown';
 }
 
 async function importFontFile(file) {
-    try {
-        const buffer = await file.arrayBuffer();
-        const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
-        const familyName = 'UserFont_' + baseName + '_' + Date.now();
-        const fontFace = new FontFace(familyName, buffer);
-        await fontFace.load();
-        document.fonts.add(fontFace);
-        state.customFontFamily = familyName;
-        customFontOption.disabled = false;
-        customFontOption.textContent = '自定义：' + baseName;
+  try {
+    const buffer = await file.arrayBuffer();
+    const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const familyName = 'UserFont_' + baseName + '_' + Date.now();
+    const fontFace = new FontFace(familyName, buffer);
+    await fontFace.load();
+    document.fonts.add(fontFace);
+    state.customFontFamily = familyName;
+    customFontOption.disabled = false;
+    customFontOption.textContent = '自定义：' + baseName;
 
-        requestAnimationFrame(() => {
-            /* 先清空再设值，强制 mdui-select 重新读取 menu-item 的文本 */
-            fontFamilySelect.value = '';
-            fontFamilySelect.value = 'custom';
+    requestAnimationFrame(() => {
+      fontFamilySelect.value = '';
+      fontFamilySelect.value = 'custom';
+      state.fontFamily = 'custom';
+      applyStyles();
+    });
+    toast('字体已加载：' + file.name);
+  } catch (err) {
+    console.error(err);
+    toast('字体加载失败：' + (err.message || err));
+  }
+}
 
-            state.fontFamily = 'custom';
-            applyStyles();
-        });
-        toast('字体已加载：' + file.name);
-    } catch (err) {
-        console.error(err);
-        toast('字体加载失败：' + (err.message || err));
-    }
+async function importDocxFile(file) {
+  await ensureMammoth();
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await window.mammoth.extractRawText({ arrayBuffer });
+  editorField.value = result.value || '';
+  updateText();
+  mainScroller.reset();
+  toast('已导入：' + file.name);
+}
+
+async function importOdtFile(file) {
+  await ensureJSZip();
+  const arrayBuffer = await file.arrayBuffer();
+  const zip = await window.JSZip.loadAsync(arrayBuffer);
+  const contentFile = zip.file('content.xml');
+  if (!contentFile) throw new Error('无效的 ODT 文件');
+  const xml = await contentFile.async('string');
+  editorField.value = extractOdtText(xml);
+  updateText();
+  mainScroller.reset();
+  toast('已导入：' + file.name);
 }
 
 async function importFile(file) {
-    if (!file) return;
-    const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!file) return;
 
-    if (FONT_EXT.includes(ext)) {
-        await importFontFile(file);
-        return;
-    }
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
 
-    try {
-        if (TEXT_EXT.includes(ext)) {
-            editorField.value = await file.text();
-        } else if (ext === 'docx') {
-            await ensureMammoth();
-            const arrayBuffer = await file.arrayBuffer();
-            const result = await window.mammoth.extractRawText({ arrayBuffer });
-            editorField.value = result.value || '';
-        } else if (ext === 'odt') {
-            await ensureJSZip();
-            const arrayBuffer = await file.arrayBuffer();
-            const zip = await window.JSZip.loadAsync(arrayBuffer);
-            const contentFile = zip.file('content.xml');
-            if (!contentFile) throw new Error('无效的 ODT 文件');
-            const xml = await contentFile.async('string');
-            editorField.value = extractOdtText(xml);
-        } else if (ext === 'doc') {
-            toast('老式 .doc 二进制格式无法解析，请先另存为 .docx 后再导入');
-            return;
-        } else {
-            toast('不支持的文件格式：.' + ext);
-            return;
+  // 1. 内容检测（魔数优先）
+  let kind = 'unknown';
+  try {
+    kind = await detectFileKind(file);
+  } catch (err) {
+    console.error('检测文件类型失败', err);
+  }
+
+  // 2. 检测不出来时，用扩展名兜底
+  if (kind === 'unknown') {
+    if (TEXT_EXT.includes(ext)) kind = 'text';
+    else if (ext === 'docx') kind = 'docx';
+    else if (ext === 'odt') kind = 'odt';
+    else if (ext === 'doc') kind = 'doc';
+    else if (FONT_EXT.includes(ext)) kind = 'font';
+  }
+
+  // 3. 分发
+  try {
+    switch (kind) {
+      case 'text': {
+        try {
+          editorField.value = await file.text();
+        } catch (_) {
+          const buf = await file.arrayBuffer();
+          editorField.value = new TextDecoder('utf-8').decode(buf);
         }
         updateText();
         mainScroller.reset();
         toast('已导入：' + file.name);
-    } catch (err) {
-        console.error(err);
-        toast('导入失败：' + (err.message || err));
+        return;
+      }
+      case 'docx':
+        await importDocxFile(file);
+        return;
+      case 'odt':
+        await importOdtFile(file);
+        return;
+      case 'doc':
+        toast('检测到老式 Office 二进制格式（如 .doc），无法解析，请先另存为 .docx 后再导入');
+        return;
+      case 'font':
+        await importFontFile(file);
+        return;
     }
+    toast('无法识别的文件格式：' + file.name + (ext ? '（扩展名 .' + ext + '）' : ''));
+  } catch (err) {
+    console.error(err);
+    toast('导入失败：' + (err.message || err));
+  }
 }
 
 importBtn.addEventListener('click', () => fileInput.click());
 
 fileInput.addEventListener('change', async () => {
-    const file = fileInput.files && fileInput.files[0];
-    fileInput.value = '';
-    if (file) await importFile(file);
+  const file = fileInput.files && fileInput.files[0];
+  fileInput.value = '';
+  if (file) await importFile(file);
 });
 
 /* =========================================================
@@ -1238,79 +1349,79 @@ fileInput.addEventListener('change', async () => {
 const GUIDE_KEY = 'mdui-prompter-guide-dismissed-v1';
 
 function isGuideDismissed() {
-    try { return localStorage.getItem(GUIDE_KEY) === '1'; }
-    catch (_) { return false; }
+  try { return localStorage.getItem(GUIDE_KEY) === '1'; }
+  catch (_) { return false; }
 }
 
 function dismissGuide() {
-    try { localStorage.setItem(GUIDE_KEY, '1'); } catch (_) {}
-    guideOverlay.classList.remove('show');
-    guideOverlay.hidden = true;
+  try { localStorage.setItem(GUIDE_KEY, '1'); } catch (_) {}
+  guideOverlay.classList.remove('show');
+  guideOverlay.hidden = true;
 }
 
 function updateGuidePosition() {
-    if (guideOverlay.hidden) return;
-    const rect = startBtn.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
+  if (guideOverlay.hidden) return;
+  const rect = startBtn.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
 
-    guideGlow.style.left = cx + 'px';
-    guideGlow.style.top  = cy + 'px';
+  guideGlow.style.left = cx + 'px';
+  guideGlow.style.top  = cy + 'px';
 
-    const glowRadius = 90;
-    const arrowTop = cy + glowRadius + 12;
-    guideArrow.style.left = cx + 'px';
-    guideArrow.style.top  = arrowTop + 'px';
+  const glowRadius = 90;
+  const arrowTop = cy + glowRadius + 12;
+  guideArrow.style.left = cx + 'px';
+  guideArrow.style.top  = arrowTop + 'px';
 
-    const textTop = arrowTop + 18 + 12;
-    guideText.style.top = textTop + 'px';
+  const textTop = arrowTop + 18 + 12;
+  guideText.style.top = textTop + 'px';
 
-    guideText.style.left = '0px';
+  guideText.style.left = '0px';
+  guideText.style.right = 'auto';
+  guideText.style.transform = 'translateX(-50%)';
+  const textW = guideText.offsetWidth;
+  const textLeft = cx - textW / 2;
+  const textRight = cx + textW / 2;
+
+  if (textRight > window.innerWidth - 16) {
+    guideText.style.left = 'auto';
+    guideText.style.right = '16px';
+    guideText.style.transform = 'none';
+  } else if (textLeft < 16) {
+    guideText.style.left = '16px';
     guideText.style.right = 'auto';
-    guideText.style.transform = 'translateX(-50%)';
-    const textW = guideText.offsetWidth;
-    const textLeft = cx - textW / 2;
-    const textRight = cx + textW / 2;
-
-    if (textRight > window.innerWidth - 16) {
-        guideText.style.left = 'auto';
-        guideText.style.right = '16px';
-        guideText.style.transform = 'none';
-    } else if (textLeft < 16) {
-        guideText.style.left = '16px';
-        guideText.style.right = 'auto';
-        guideText.style.transform = 'none';
-    }
+    guideText.style.transform = 'none';
+  }
 }
 
 function showGuide() {
-    guideOverlay.hidden = false;
-    requestAnimationFrame(() => {
-        guideOverlay.classList.add('show');
-        updateGuidePosition();
-    });
+  guideOverlay.hidden = false;
+  requestAnimationFrame(() => {
+    guideOverlay.classList.add('show');
+    updateGuidePosition();
+  });
 }
 
 window.addEventListener('resize', updateGuidePosition, { passive: true });
 window.addEventListener('scroll', updateGuidePosition, { passive: true });
 
 guideOverlay.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dismissGuide();
+  e.preventDefault();
+  e.stopPropagation();
+  dismissGuide();
 });
 
 function maybeShowGuide() {
-    if (isGuideDismissed()) return;
-    requestAnimationFrame(() => requestAnimationFrame(() => { showGuide(); }));
+  if (isGuideDismissed()) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => { showGuide(); }));
 }
 
 /* =========================================================
    窗口尺寸变化
    ========================================================= */
 window.addEventListener('resize', () => {
-    previewScroller.measure();
-    mainScroller.measure();
+  previewScroller.measure();
+  mainScroller.measure();
 });
 
 /* =========================================================
@@ -1343,22 +1454,22 @@ applyStyles();
 previewScroller.playing = true;
 
 if (window.customElements && customElements.whenDefined) {
-    Promise.allSettled([
-        customElements.whenDefined('mdui-slider'),
-        customElements.whenDefined('mdui-chip'),
-        customElements.whenDefined('mdui-text-field'),
-        customElements.whenDefined('mdui-button-icon'),
-        customElements.whenDefined('mdui-select'),
-        customElements.whenDefined('mdui-menu-item'),
-        customElements.whenDefined('mdui-dialog'),
-        customElements.whenDefined('mdui-top-app-bar'),
-        customElements.whenDefined('mdui-top-app-bar-title'),
-        customElements.whenDefined('mdui-navigation-bar')
-    ]).then(() => {
-        requestAnimationFrame(() => {
-            applyStyles();
-            updateText();
-            setTimeout(maybeShowGuide, 400);
-        });
+  Promise.allSettled([
+    customElements.whenDefined('mdui-slider'),
+    customElements.whenDefined('mdui-chip'),
+    customElements.whenDefined('mdui-text-field'),
+    customElements.whenDefined('mdui-button-icon'),
+    customElements.whenDefined('mdui-select'),
+    customElements.whenDefined('mdui-menu-item'),
+    customElements.whenDefined('mdui-dialog'),
+    customElements.whenDefined('mdui-top-app-bar'),
+    customElements.whenDefined('mdui-top-app-bar-title'),
+    customElements.whenDefined('mdui-navigation-bar')
+  ]).then(() => {
+    requestAnimationFrame(() => {
+      applyStyles();
+      updateText();
+      setTimeout(maybeShowGuide, 400);
     });
+  });
 }
