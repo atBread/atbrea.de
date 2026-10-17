@@ -1327,8 +1327,19 @@ async function importFile(file) {
       case 'font':
         await importFontFile(file);
         return;
+      default:
+        // 未知类型默认按文本导入
+        try {
+          editorField.value = await file.text();
+        } catch (_) {
+          const buf = await file.arrayBuffer();
+          editorField.value = new TextDecoder('utf-8').decode(buf);
+        }
+        updateText();
+        mainScroller.reset();
+        toast('已按文本导入：' + file.name);
+        return;
     }
-    toast('无法识别的文件格式：' + file.name + (ext ? '（扩展名 .' + ext + '）' : ''));
   } catch (err) {
     console.error(err);
     toast('导入失败：' + (err.message || err));
