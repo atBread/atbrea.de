@@ -1,7 +1,8 @@
 # A Blog Webpage
 
 [![license](https://badgen.net/github/license/atBread/atbrea.de)](https://github.com/atBread/atbrea.de/blob/main/LICENSE)
-  
+[![GitHub](https://badgen.net/badge/GitHub/atBread/black?icon=github)](https://github.com/atBread/atbrea.de/)
+
 ## Licenses
 - UI Library: [mdui v2](https://github.com/zdhxiong/mdui), MIT License
 - Custom UI components: Generated with LLM, manually reviewed, revised and integrated, released under MIT License
