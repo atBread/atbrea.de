@@ -27,7 +27,7 @@
   </style>
 </head>
 
-<body>
+<body style="opacity: 0">
 <div id="morphLayer"></div>
 <div id="pageContent" style="opacity:0">
 <div style="text-align: center;" class="grid-wrap-wrapper">
@@ -94,34 +94,29 @@
 </div>
 <script src="xvyu/src/main.js"></script>
 <script>
-  (function initCrossDomainMorph() {
-  const params = new URLSearchParams(location.search);
-  const morph = params.get('morph');
-  if (!morph) {
-    // 没有 morph 参数，正常显示页面
-    document.getElementById('pageContent').style.opacity = '1';
+(function initMorphIn() {
+  const raw = sessionStorage.getItem('morphFrom');
+  if (!raw) {
+    document.body.style.opacity = '1';
     return;
   }
+  sessionStorage.removeItem('morphFrom');
 
-  const [x, y, w, h] = morph.split(',').map(Number);
-  const bg = params.get('bg') || '#006463';
-  const radius = params.get('radius') || '8px';
+  let data;
+  try { data = JSON.parse(raw); } catch (_) { document.body.style.opacity = '1'; return; }
 
   const el = document.getElementById('morphLayer');
-
-  // 初始状态：和主站按钮完全重合
   el.style.transition = 'none';
   el.style.display = 'block';
-  el.style.background = bg;
+  el.style.background = data.bg;
   el.style.opacity = '1';
-  el.style.left = x + 'px';
-  el.style.top = y + 'px';
-  el.style.width = w + 'px';
-  el.style.height = h + 'px';
-  el.style.borderRadius = radius;
+  el.style.left = data.x + 'px';
+  el.style.top = data.y + 'px';
+  el.style.width = data.w + 'px';
+  el.style.height = data.h + 'px';
+  el.style.borderRadius = data.radius;
   void el.offsetWidth;
 
-  // 展开到全屏
   el.classList.add('visible');
   el.style.transition =
     'left 600ms cubic-bezier(0.22,1,0.36,1), top 600ms cubic-bezier(0.22,1,0.36,1), ' +
@@ -133,20 +128,14 @@
     el.style.width = window.innerWidth + 'px';
     el.style.height = window.innerHeight + 'px';
     el.style.borderRadius = '0px';
-    el.style.background = '#ffffff';
+    el.style.background = data.to;
   });
 
-  // 展开结束后显示页面内容，清除 URL 参数
   setTimeout(() => {
-    document.getElementById('pageContent').style.opacity = '1';
+    document.body.style.opacity = '1';
     el.style.transition = 'opacity 200ms ease';
     el.style.opacity = '0';
-    setTimeout(() => {
-      el.style.display = 'none';
-      // 清除 URL 参数，刷新时不再播动画
-      const clean = location.pathname + location.hash;
-      history.replaceState(null, '', clean);
-    }, 220);
+    setTimeout(() => { el.style.display = 'none'; }, 220);
   }, 650);
 })();
 </script>
