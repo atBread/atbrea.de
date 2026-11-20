@@ -12,10 +12,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdn.xrbk.cn/fonts/HarmonyOS_Sans_SC/result.css" rel="stylesheet">
 
+  <style>
+    #morphLayer {
+      position: fixed;
+      z-index: 999998;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      display: none;
+      will-change: left, top, width, height, border-radius, opacity, background-color;
+    }
+  #morphLayer.visible { opacity: 1; }
+    
+  </style>
 </head>
 
 <body>
-
+<div id="morphLayer"></div>
+<div id="pageContent" style="opacity:0">
 <div style="text-align: center;" class="grid-wrap-wrapper">
   <div class="adaptive-box">
     <br></br>
@@ -77,7 +91,64 @@
   </div>
 <!-- Copyright © QHFS's Everyone | 直链下载途径由 InfiniCLOUD Japan及Cloudflare Workers 提供支持 | 本网站由 GitHub及Vercel 驱动  -->
 </div>
-
+</div>
 <script src="xvyu/src/main.js"></script>
+<script>
+  (function initCrossDomainMorph() {
+  const params = new URLSearchParams(location.search);
+  const morph = params.get('morph');
+  if (!morph) {
+    // 没有 morph 参数，正常显示页面
+    document.getElementById('pageContent').style.opacity = '1';
+    return;
+  }
+
+  const [x, y, w, h] = morph.split(',').map(Number);
+  const bg = params.get('bg') || '#006463';
+  const radius = params.get('radius') || '8px';
+
+  const el = document.getElementById('morphLayer');
+
+  // 初始状态：和主站按钮完全重合
+  el.style.transition = 'none';
+  el.style.display = 'block';
+  el.style.background = bg;
+  el.style.opacity = '1';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.style.width = w + 'px';
+  el.style.height = h + 'px';
+  el.style.borderRadius = radius;
+  void el.offsetWidth;
+
+  // 展开到全屏
+  el.classList.add('visible');
+  el.style.transition =
+    'left 600ms cubic-bezier(0.22,1,0.36,1), top 600ms cubic-bezier(0.22,1,0.36,1), ' +
+    'width 600ms cubic-bezier(0.22,1,0.36,1), height 600ms cubic-bezier(0.22,1,0.36,1), ' +
+    'border-radius 600ms cubic-bezier(0.22,1,0.36,1), background-color 600ms cubic-bezier(0.22,1,0.36,1)';
+  requestAnimationFrame(() => {
+    el.style.left = '0px';
+    el.style.top = '0px';
+    el.style.width = window.innerWidth + 'px';
+    el.style.height = window.innerHeight + 'px';
+    el.style.borderRadius = '0px';
+    el.style.background = '#ffffff';
+  });
+
+  // 展开结束后显示页面内容，清除 URL 参数
+  setTimeout(() => {
+    document.getElementById('pageContent').style.opacity = '1';
+    el.style.transition = 'opacity 200ms ease';
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.style.display = 'none';
+      // 清除 URL 参数，刷新时不再播动画
+      const clean = location.pathname + location.hash;
+      history.replaceState(null, '', clean);
+    }, 220);
+  }, 650);
+})();
+</script>
 </body>
 </html>
